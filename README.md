@@ -116,5 +116,8 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
-June 29, 2012
+0.1.1 : July 1, 2012
+* Updates the git URL in the package.json.
+
+0.1.0 : June 29, 2012
 * Initial Release.
