@@ -235,13 +235,13 @@ exports.initSinon = function(sinonObject) {
              * @return object (DevInfo)
              */
             stubDevInfo: function(deviceId, manufacturer, model, dmVersion, language) {
-                return {
+                return sinon.stub({
                     deviceId: deviceId,
                     manufacturer: manufacturer,
                     model: model,
                     dmVersion: dmVersion,
                     language: language,
-                };
+                });
             },
 
             /**
@@ -251,7 +251,7 @@ exports.initSinon = function(sinonObject) {
              * @return object (DmJob)
              */
             stubDmJob: function(arguments) {
-                return {
+                return sinon.stub({
                     uid: null,
                     activateTimestamp: null,
                     createTimestamp: null,
@@ -269,7 +269,7 @@ exports.initSinon = function(sinonObject) {
                     sessionId: null,
                     status: null,
                     arguments: arguments
-                };
+                });
             },
 
             /**
@@ -279,10 +279,11 @@ exports.initSinon = function(sinonObject) {
              * @return object (ClientAlert)
              */
             stubClientAlert: function(data) {
-                return {
-                    data: data,
+                var stub = sinon.stub({
                     isGenericAlert: function() {},
-                };
+                });
+                stub.data = data;
+                return stub;
             },
 
             /**
@@ -292,9 +293,9 @@ exports.initSinon = function(sinonObject) {
              * @return object (ItemData)
              */
             stubItemData: function(status) {
-                return {
+                return sinon.stub({
                     status: status,
-                };
+                });
             }
         };
         // Overwrite the default init() method.
