@@ -77,6 +77,7 @@ With [Sinon.JS](http://sinonjs.org/) and [NodeUnit](https://github.com/caolan/no
       :
       snip
       :
+      assert.equal(true, session.commit.called);
       assert.done();
     }
   });
@@ -115,6 +116,10 @@ This library is dual-licensed under:
 Copyright © 2012 Inventit Inc.
 
 ## Change History
+
+0.1.2 : July 9, 2012
+* Fixes an issue where stubClientAlert, stubItemData, stubDmJob, and stubDevInfo didn't return SinonJS stub instances.
+* Updates the example test code, adding 'assert.equals(true, session.commit.called);' so to show how to verify if a method is executed.
 
 0.1.1 : July 1, 2012
 * Updates the git URL in the package.json.
