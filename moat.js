@@ -31,8 +31,11 @@ exports.init = function() {
             query: function(type) {
                 return prepareResult('query(' + type + ')');
             },
-            selectUids: function(type) {
-                return prepareResult('selectUids(' + type + ')');
+            queryUids: function(type) {
+                return prepareResult('queryUids(' + type + ')');
+            },
+            queryCount: function(type) {
+                return prepareResult('queryCount(' + type + ')');
             },
             updateSingletonField: function(type, fieldName, fieldValue) {
                 return prepareResult('updateSingletonField(' + type + ',' + fieldName + ',' + fieldValue + ')');
@@ -165,7 +168,9 @@ exports.initSinon = function(sinonObject) {
                         },
                     query: function(type) {
                         },
-                    selectUids: function(type) {
+                    queryUids: function(type) {
+                        },
+                    queryCount: function(type) {
                         },
                     updateSingletonField: function(type, fieldName, fieldValue) {
                         },

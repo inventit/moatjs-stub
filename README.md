@@ -117,6 +117,10 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
+0.1.3 : July 17, 2012
+* Adds a new function 'queryCount' to the MessageSession stubs.
+* Changes the function name, from 'selectUids' to 'queryUids' in the MessageSession stubs.
+
 0.1.2 : July 9, 2012
 * Fixes an issue where stubClientAlert, stubItemData, stubDmJob, and stubDevInfo didn't return SinonJS stub instances.
 * Updates the example test code, adding 'assert.equals(true, session.commit.called);' so to show how to verify if a method is executed.
