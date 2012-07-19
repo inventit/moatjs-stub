@@ -49,17 +49,11 @@ exports.init = function() {
             update: function(type, uid, entity) {
                 return prepareResult('update(' + type + ',' + uid + ',' + entity + ')');
             },
-            insertSingleton: function(type, entity) {
-                return prepareResult('insertSingleton(' + type + ',' + entity + ')');
-            },
             insert: function(type, uid, entity) {
                 return prepareResult('insert(' + type + ',' + uid + ',' + entity + ')');
             },
-            removeSingleton: function(type, entity) {
-                return prepareResult('removeSingleton(' + type + ',' + entity + ')');
-            },
-            remove: function(type, uid, entity) {
-                return prepareResult('remove(' + type + ',' + uid + ',' + entity + ')');
+            remove: function(type, uid) {
+                return prepareResult('remove(' + type + ',' + uid + ')');
             },
             runSingleton: function(type, operationName, data) {
                 return prepareResult('runSingleton(' + type + ',' + operationName + ',' + data + ')');
@@ -184,9 +178,9 @@ exports.initSinon = function(sinonObject) {
                         },
                     insert: function(type, uid, entity) {
                         },
-                    removeSingleton: function(type, entity) {
+                    removeSingleton: function(type) {
                         },
-                    remove: function(type, uid, entity) {
+                    remove: function(type, uid) {
                         },
                     runSingleton: function(type, operationName, data) {
                         },

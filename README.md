@@ -117,6 +117,10 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
+0.1.4 : July ??, 2012
+* Fixes the wrong remove* function definitions.
+* Removes unused function definitions.
+
 0.1.3 : July 17, 2012
 * Adds a new function 'queryCount' to the MessageSession stubs.
 * Changes the function name, from 'selectUids' to 'queryUids' in the MessageSession stubs.
