@@ -77,6 +77,10 @@ With [Sinon.JS](http://sinonjs.org/) and [NodeUnit](https://github.com/caolan/no
       :
       snip
       :
+      // Run the script
+      require('/path/to/tested/script.js');
+
+      // Assertion
       assert.equal(true, session.commit.called);
       assert.done();
     }
@@ -116,6 +120,12 @@ This library is dual-licensed under:
 Copyright © 2012 Inventit Inc.
 
 ## Change History
+
+0.1.4 : July 24, 2012
+* Adds how to invoke a tested script in a test case on README.md.
+* Adds a new argument, 'block'(a function), to MessageSession object.
+* Fixes the wrong remove* and insert* function definitions.
+* Removes unused function definitions.
 
 0.1.3 : July 17, 2012
 * Adds a new function 'queryCount' to the MessageSession stubs.
