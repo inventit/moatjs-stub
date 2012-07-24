@@ -12,6 +12,7 @@ exports.init = function() {
     var session = (function() {
         var waitForResultNotification = false;
         var result = {};
+
         function prepareResult(token) {
             result[token] = {
                 childNodes: null,
@@ -22,44 +23,44 @@ exports.init = function() {
             log: function(message) {
                 console.log(message);
             },
-            querySingleton: function(type) {
-                return prepareResult('querySingleton(' + type + ')');
+            querySingleton: function(type, block) {
+                return prepareResult('querySingleton(' + type + ', ' + block + ')');
             },
-            queryForUid: function(type, uid) {
-                return prepareResult('queryForUid(' + type + ',' + uid + ')');
+            queryByUid: function(type, uid, block) {
+                return prepareResult('queryByUid(' + type + ',' + uid + ', ' + block + ')');
             },
-            query: function(type) {
-                return prepareResult('query(' + type + ')');
+            query: function(type, block) {
+                return prepareResult('query(' + type + ', ' + block + ')');
             },
-            queryUids: function(type) {
-                return prepareResult('queryUids(' + type + ')');
+            queryUids: function(type, block) {
+                return prepareResult('queryUids(' + type + ', ' + block + ')');
             },
-            queryCount: function(type) {
-                return prepareResult('queryCount(' + type + ')');
+            queryCount: function(type, block) {
+                return prepareResult('queryCount(' + type + ', ' + block + ')');
             },
-            updateSingletonField: function(type, fieldName, fieldValue) {
-                return prepareResult('updateSingletonField(' + type + ',' + fieldName + ',' + fieldValue + ')');
+            updateSingletonField: function(type, fieldName, fieldValue, block) {
+                return prepareResult('updateSingletonField(' + type + ',' + fieldName + ',' + fieldValue + ', ' + block + ')');
             },
-            updateField: function(type, uid, fieldName, fieldValue) {
-                return prepareResult('updateField(' + type + ',' + uid + ',' + fieldName + ',' + fieldValue + ')');
+            updateField: function(type, uid, fieldName, fieldValue, block) {
+                return prepareResult('updateField(' + type + ',' + uid + ',' + fieldName + ',' + fieldValue + ', ' + block + ')');
             },
-            updateSingleton: function(type, entity) {
-                return prepareResult('updateSingleton(' + type + ',' + entity + ')');
+            updateSingleton: function(type, entity, block) {
+                return prepareResult('updateSingleton(' + type + ',' + entity + ', ' + block + ')');
             },
-            update: function(type, uid, entity) {
-                return prepareResult('update(' + type + ',' + uid + ',' + entity + ')');
+            update: function(type, uid, entity, block) {
+                return prepareResult('update(' + type + ',' + uid + ',' + entity + ', ' + block + ')');
             },
-            insert: function(type, uid, entity) {
-                return prepareResult('insert(' + type + ',' + uid + ',' + entity + ')');
+            insert: function(type, uid, entity, block) {
+                return prepareResult('insert(' + type + ',' + uid + ',' + entity + ', ' + block + ')');
             },
-            remove: function(type, uid) {
-                return prepareResult('remove(' + type + ',' + uid + ')');
+            remove: function(type, uid, block) {
+                return prepareResult('remove(' + type + ',' + uid + ', ' + block + ')');
             },
-            runSingleton: function(type, operationName, data) {
-                return prepareResult('runSingleton(' + type + ',' + operationName + ',' + data + ')');
+            runSingleton: function(type, operationName, data, block) {
+                return prepareResult('runSingleton(' + type + ',' + operationName + ',' + data + ', ' + block + ')');
             },
-            run: function(type, operationName, data) {
-                return prepareResult('run(' + type + ',' + operationName + ',' + data + ')');
+            run: function(type, operationName, data, block) {
+                return prepareResult('run(' + type + ',' + operationName + ',' + data + ', ' + block + ')');
             },
             setWaitingForResultNotification: function(tf) {
                 waitForResultNotification = tf;
@@ -93,7 +94,7 @@ exports.init = function() {
                 }
             },
         }
-    } ());
+    }());
     var now = new Date().toUTCString();
     return {
         session: session,
@@ -133,7 +134,7 @@ exports.init = function() {
  * Creates a factory instance to instantiate stub objects with Sinon.JS.
  *
  * You need to install Sinon.JS to use this function.
- * 
+ *
  * @param object sinonObject
  */
 exports.initSinon = function(sinonObject) {
@@ -156,59 +157,35 @@ exports.initSinon = function(sinonObject) {
              */
             stubMessageSession: function() {
                 var stub = sinon.stub({
-                    querySingleton: function(type) {
-                        },
-                    queryForUid: function(type, uid) {
-                        },
-                    query: function(type) {
-                        },
-                    queryUids: function(type) {
-                        },
-                    queryCount: function(type) {
-                        },
-                    updateSingletonField: function(type, fieldName, fieldValue) {
-                        },
-                    updateField: function(type, uid, fieldName, fieldValue) {
-                        },
-                    updateSingleton: function(type, entity) {
-                        },
-                    update: function(type, uid, entity) {
-                        },
-                    insertSingleton: function(type, entity) {
-                        },
-                    insert: function(type, uid, entity) {
-                        },
-                    removeSingleton: function(type) {
-                        },
-                    remove: function(type, uid) {
-                        },
-                    runSingleton: function(type, operationName, data) {
-                        },
-                    run: function(type, operationName, data) {
-                        },
-                    setWaitingForResultNotification: function(tf) {
-                        },
-                    commit: function(commitState, methodBlock) {
-                        },
-                    notifySync: function(entity, methodBlock) {
-                        },
-                    notifyAsync: function(entity) {
-                        },
-                    fetchUrlSync: function(url, params, methodBlock) {
-                        },
+                    querySingleton: function(type, block) {},
+                    queryByUid: function(type, uid, block) {},
+                    query: function(type, block) {},
+                    queryUids: function(type, block) {},
+                    queryCount: function(type, block) {},
+                    updateSingletonField: function(type, fieldName, fieldValue, block) {},
+                    updateField: function(type, uid, fieldName, fieldValue, block) {},
+                    updateSingleton: function(type, entity, block) {},
+                    update: function(type, uid, entity, block) {},
+                    insert: function(type, uid, entity, block) {},
+                    remove: function(type, uid, block) {},
+                    runSingleton: function(type, operationName, data, block) {},
+                    run: function(type, operationName, data, block) {},
+                    setWaitingForResultNotification: function(tf) {},
+                    commit: function(commitState, block) {},
+                    notifySync: function(entity, block) {},
+                    notifyAsync: function(entity) {},
+                    fetchUrlSync: function(url, params, block) {},
                 });
 
-                // 'log' is not a stub method.
                 stub.log = function(message) {
                     console.log(message);
                 };
-
                 return stub;
             },
 
             /**
              * A factory method for ClientRequest stub object.
-             * 
+             *
              * @param Array clientAlerts
              * @param object:stubDevInfo() devInfo
              * @param object:stubDmJob() dmJob
@@ -299,6 +276,89 @@ exports.initSinon = function(sinonObject) {
         };
         // Overwrite the default init() method.
         exports.init = function() {
+            var blocks = [];
+            var tokens = [];
+
+            function prepare(token, block) {
+                if (block) {
+                    console.log('token-->' + token);
+                    blocks.push(block);
+                    tokens.push(token);
+                }
+                return token;
+            }
+            var stub = stubContext.session;
+            stubContext.session = {
+                querySingleton: function(type, block) {
+                    return prepare(stub.querySingleton(type, block), block);
+                },
+                queryByUid: function(type, uid, block) {
+                    return prepare(stub.queryByUid(type, uid, block), block);
+                },
+                query: function(type, block) {
+                    return prepare(stub.query(type, block), block);
+                },
+                queryUids: function(type, block) {
+                    return prepare(stub.queryUids(type, block), block);
+                },
+                queryCount: function(type, block) {
+                    return prepare(stub.queryCount(type, block), block);
+                },
+                updateSingletonField: function(type, fieldName, fieldValue, block) {
+                    return prepare(stub.updateSingletonField(type, fieldName, fieldValue, block), block)
+                },
+                updateField: function(type, uid, fieldName, fieldValue, block) {
+                    return prepare(stub.updateField(type, uid, fieldName, fieldValue, block), block);
+                },
+                updateSingleton: function(type, entity, block) {
+                    return prepare(stub.updateSingleton(type, entity, block), block);
+                },
+                update: function(type, uid, entity, block) {
+                    return prepare(stub.update(type, uid, entity, block), block);
+                },
+                insert: function(type, uid, entity, block) {
+                    return prepare(stub.insert(type, uid, entity, block), block);
+                },
+                remove: function(type, uid, block) {
+                    return prepare(stub.remove(type, uid, block), block);
+                },
+                runSingleton: function(type, operationName, data, block) {
+                    return prepare(stub.runSingleton(type, operationName, data, block), block);
+                },
+                run: function(type, uid, operationName, data, block) {
+                    return prepare(stub.run(type, uid, operationName, data, block), block)
+                },
+                setWaitingForResultNotification: function(tf) {
+                    return stub.setWaitingForResultNotification(tf);
+                },
+                notifySync: function(entity, block) {
+                    return stub.notifySync(entity, block);
+                },
+                notifyAsync: function(entity) {
+                    return stub.notifyAsync(entity);
+                },
+                fetchUrlSync: function(url, params, block) {
+                    return stub.fetchUrlSync(url, params, block);
+                },
+                commit: function(commitState, block) {
+                    var result = stub.commit(commitState, block);
+                    for (var i = 0; i < blocks.length; i++) {
+                        if (blocks[i]) {
+                            blocks[i](result[tokens[i]]);
+                        }
+                    }
+                    if (block) {
+                        block(result);
+                    }
+                    blocks = [];
+                    tokens = [];
+                    return result;
+                },
+                log: function(message) {
+                    console.log(message);
+                },
+            };
+
             return stubContext;
         };
         return context;
