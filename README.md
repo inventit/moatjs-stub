@@ -121,7 +121,9 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
-Unreleased : N/A
+0.1.5 : August 22, 2012
+* Modifies the attribute name of ClientRequest, from 'clientAlerts' to 'objects'.
+* stubClientAlert() function is removed. Now a native javascript object or stub can be put in the first argument of stubClientRequest().
 * Updates MOAT-js links (July 27, 2012)
 
 0.1.4 : July 24, 2012

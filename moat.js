@@ -99,7 +99,7 @@ exports.init = function() {
     return {
         session: session,
         clientRequest: {
-            clientAlerts: null,
+            objects: null,
             devInfo: {
                 deviceId: 'deviceId',
                 manufacturer: 'manufacturer',
@@ -186,15 +186,15 @@ exports.initSinon = function(sinonObject) {
             /**
              * A factory method for ClientRequest stub object.
              *
-             * @param Array clientAlerts
+             * @param Array objects
              * @param object:stubDevInfo() devInfo
              * @param object:stubDmJob() dmJob
              * @return object (ClientRequest)
              */
-            stubClientRequest: function(clientAlerts, devInfo, dmJob) {
+            stubClientRequest: function(objects, devInfo, dmJob) {
                 return {
                     // An Association Array
-                    clientAlerts: clientAlerts,
+                    objects: objects,
                     devInfo: devInfo,
                     dmJob: dmJob,
                 };
@@ -246,20 +246,6 @@ exports.initSinon = function(sinonObject) {
                     status: null,
                     arguments: arguments
                 });
-            },
-
-            /**
-             * A factory method for ClientAlert stub object.
-             *
-             * @param String data
-             * @return object (ClientAlert)
-             */
-            stubClientAlert: function(data) {
-                var stub = sinon.stub({
-                    isGenericAlert: function() {},
-                });
-                stub.data = data;
-                return stub;
             },
 
             /**
