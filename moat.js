@@ -125,7 +125,8 @@ exports.init = function() {
                 sessionId: 0xfff,
                 status: 'status',
                 arguments: null
-            }
+            },
+            database: database
         }
     };
 };
@@ -193,7 +194,6 @@ exports.initSinon = function(sinonObject) {
              */
             stubClientRequest: function(objects, devInfo, dmJob) {
                 return {
-                    // An Association Array
                     objects: objects,
                     devInfo: devInfo,
                     dmJob: dmJob,
@@ -258,7 +258,22 @@ exports.initSinon = function(sinonObject) {
                 return sinon.stub({
                     status: status,
                 });
-            }
+            },
+
+            /**
+             * A factory method for Database stub object.
+             *
+             * @return object (Database)
+             */
+            stubDatabase: function() {
+                return sinon.stub({
+                    insert: function(type, entity) {},
+                    update: function(type, uid, entity) {},
+                    remove: function(type, uid) {},
+                    query: function(type, offsetOrToken, limit) {},
+                    queryByUid: function(type, uid) {},
+                });
+            },
         };
         // Overwrite the default init() method.
         exports.init = function() {

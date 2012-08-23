@@ -121,7 +121,9 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
-0.1.5 : August 22, 2012
+0.1.5 : August 23, 2012
+* Introduces a new 'Database' type. The Database type provides methods to access an underlying cloud database managed by MOAT js runtime, which can be accessed from MOAT REST API as well.
+* Adds a new attribute 'database' to ClientRequest type. and a new function to create a stub Database object.
 * Modifies the attribute name of ClientRequest, from 'clientAlerts' to 'objects'.
 * stubClientAlert() function is removed. Now a native javascript object or stub can be put in the first argument of stubClientRequest().
 * Updates MOAT-js links (July 27, 2012)
