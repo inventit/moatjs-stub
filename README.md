@@ -14,7 +14,7 @@ The library offers you:
 
 ## Deploy it without any change!
 You can deploy a script depending on this library to a cloud server AS IT IS.
-This is because Inventit® Service-Sync runtime automcatically ignores the 'require' statement.
+This is because Inventit® Service-Sync runtime automatically ignores the 'require' statement.
 
 ## How to install
 
@@ -120,6 +120,10 @@ This library is dual-licensed under:
 Copyright © 2012 Inventit Inc.
 
 ## Change History
+
+0.1.6 : September 28, 2012
+* Adds a new function to create an arbitrary type object into MessageSession class.
+* Changes Database class interfaces (insert(), update(), queryWithFilter(), queryByUid(), remove())
 
 0.1.5 : August 23, 2012
 * Introduces a new 'Database' type. The Database type provides methods to access an underlying cloud database managed by MOAT js runtime, which can be accessed from MOAT REST API as well.

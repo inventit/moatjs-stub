@@ -176,6 +176,7 @@ exports.initSinon = function(sinonObject) {
                     notifySync: function(entity, block) {},
                     notifyAsync: function(entity) {},
                     fetchUrlSync: function(url, params, block) {},
+                    newObject: function(type) {},
                 });
 
                 stub.log = function(message) {
@@ -267,11 +268,12 @@ exports.initSinon = function(sinonObject) {
              */
             stubDatabase: function() {
                 return sinon.stub({
-                    insert: function(type, entity) {},
-                    update: function(type, uid, entity) {},
-                    remove: function(type, uid) {},
+                    insert: function(entity) {},
+                    update: function(entity) {},
+                    remove: function(type, uids) {},
                     query: function(type, offsetOrToken, limit) {},
-                    queryByUid: function(type, uid) {},
+                    queryWithFilter: function(type, offsetOrToken, limit, filter) {},
+                    queryByUids: function(type, uids) {},
                 });
             },
         };
@@ -357,6 +359,9 @@ exports.initSinon = function(sinonObject) {
                 },
                 log: function(message) {
                     console.log(message);
+                },
+                newObject: function(type) {
+                    return stub.newObject(type);
                 },
             };
 
