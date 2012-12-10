@@ -4,8 +4,8 @@ MOAT js Testing Library
 This is a [node.js](http://node.js) library enabling you to run MOAT js script files on your local machine rather than a cloud server.
 
 ## What is MOAT js?
-[MOAT js](http://inventit.edicy.co/guides/moat-iot/moat-js) is a javascript API to build a server side application interacting with remote devices such as [OMA-DM](http://en.wikipedia.org/wiki/OMA_Device_Management) based devices, ZigBee devices and/or Android devices.
-It is a part of [MOAT IoT](http://inventit.edicy.co/guides/moat-iot), which is a specification set of creating IoT applications running on Inventit® Service-Sync environment.
+[MOAT js](http://dev.yourinventit.com/guides/moat-iot/moat-js) is a javascript API to build a server side application interacting with remote devices such as [OMA-DM](http://en.wikipedia.org/wiki/OMA_Device_Management) based devices, ZigBee devices and/or Android devices.
+It is a part of [MOAT IoT](http://dev.yourinventit.com/guides/moat-iot), which is a specification set of creating IoT applications running on Inventit® Service-Sync environment.
 
 *****
 The library offers you:
@@ -121,6 +121,9 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
+0.1.7 : December 6, 2012
+* Changes the link URLs in this file
+ 
 0.1.6 : September 28, 2012
 * Adds a new function to create an arbitrary type object into MessageSession class.
 * Changes Database class interfaces (insert(), update(), queryWithFilter(), queryByUid(), remove())
