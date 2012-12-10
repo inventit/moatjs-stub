@@ -121,7 +121,7 @@ Copyright © 2012 Inventit Inc.
 
 ## Change History
 
-0.1.7 : December 6, 2012
+0.1.7 : December 10, 2012
 * Changes the link URLs in this file
  
 0.1.6 : September 28, 2012
