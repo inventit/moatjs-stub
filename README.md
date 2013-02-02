@@ -5,7 +5,7 @@ This is a [node.js](http://node.js) library enabling you to run MOAT js script f
 
 ## What is MOAT js?
 [MOAT js](http://dev.yourinventit.com/guides/moat-iot/moat-js) is a javascript API to build a server side application interacting with remote devices such as [OMA-DM](http://en.wikipedia.org/wiki/OMA_Device_Management) based devices, ZigBee devices and/or Android devices.
-It is a part of [MOAT IoT](http://dev.yourinventit.com/guides/moat-iot), which is a specification set of creating IoT applications running on Inventit® Service-Sync environment.
+It is a part of [MOAT IoT](http://dev.yourinventit.com/guides/moat-iot), which is a specification set of creating IoT/M2M applications running on Inventit® ServiceSync environment.
 
 *****
 The library offers you:
@@ -16,10 +16,23 @@ The library offers you:
 You can deploy a script depending on this library to a cloud server AS IT IS.
 This is because Inventit® Service-Sync runtime automatically ignores the 'require' statement.
 
+Use [IIDN-CLI Tool](https://github.com/inventit/iidn-cli) to deploy created scripts.
+
 ## How to install
 
+For local projects:
 <pre>
-  npm install moat
+  your-project-root> npm install moat
+</pre>
+
+For installing globally:
+<pre>
+  anywhere> npm install moat -g
+</pre>
+
+Then link related packages on your project root directory like this:
+<pre>
+  your-project-root> npm link moat nodeunit sinon
 </pre>
 
 ## How to use
@@ -40,49 +53,50 @@ With [Sinon.JS](http://sinonjs.org/) and [NodeUnit](https://github.com/caolan/no
 <pre>
   var nodeUnit = require('nodeunit');
   var sinon = require('sinon');
-  var yourScript = require('path/to/your/script.js');
+  var script = require('path').resolve('./script.js');
+  var moat = require('moat');
 
   module.exports = nodeUnit.testCase({
     setUp: function(callback) {
-      callback();
+		// IMPORTANT
+		require.cache[script] = null;
+    	callback();
     },
     tearDown: function(callback) {
-      callback();
+    	callback();
     },
     'test your script.' : function(assert) {
-      var sinonContext = moat.initSinon(sinon);
-      var context = sinonContext.getStubContext();
-      var arguments = {
-          request: JSON.stringify({
-              uid: "value1",
-              param: "value2"
-          })
-      };
-      var dmJob = sinonContext.stubDmJob(arguments);
-      var session = sinonContext.stubMessageSession();
-      var clientRequest = sinonContext.stubClientRequest(null, null, dmJob);
+		// record state
+	    var context = moat.init(sinon);
+	    var arguments = {
+	        apps: JSON.stringify({
+	            objectNameArray: ["app-1.zip"]
+	        })
+	    };
+	    context.setDevice('uid', 'deviceId', 'name', 'status', 'clientVersion', 0);
+	    context.setDmjob('uid', 'deviceId', 'name', 'status', 'jobServiceId',
+				'sessionId', arguments, 'createAt', 'activateAt', 'startAt',
+				'expiredAt', 'http', 'http://localhost');
+	    var session = context.session;
+		session.findPackage.withArgs('app-1.zip').returns({
+			get: 'http://localhost/app-1.zip',
+			head: 'http://localhost/app-1.zip',
+			type: 'my-type'
+		});
 
-      context.session = session;
-      context.clientRequest = clientRequest;
+	    var mapper = session.newModelMapperStub('MyModel');
+		var model = mapper.newModelStub();
+		context.addCommand(model, 'myCommand',
+			context.newErrorCommandEvent('fatal_error', '12345'));
 
-      session.queryForUid.withArgs('Entity1', 'value1').returns('token');
-      session.commit.withArgs('Getting an entity.').returns({
-          token: {
-              collection: [{
-                  uid: 'value1',
-                  field1: 'field1Value'
-              }]
-          }
-      });
-      :
-      snip
-      :
-      // Run the script
-      require('/path/to/tested/script.js');
+	    // Run the script (replay state)
+	    require(script);
 
-      // Assertion
-      assert.equal(true, session.commit.called);
-      assert.done();
+	    // Assertion
+	    assert.equal(true, session.commit.called);
+		assert.equal(true, mapper.add.withArgs(model).called);
+		assert.equal(true, session.notifyAsync.called);
+	    assert.done();
     }
   });
 </pre>
@@ -107,28 +121,43 @@ Simply you can type 'node *test-suite-runner.js*' so that you'll see the test re
 
 ## Where can you deploy?
 
-Unfortunately, we don't provide any open environment for deployment so far.
-However, we're planning to launch a small playground on a cloud so that you can try it as well as other MOAT IoT artifacts such MOAT REST and MOAT Android js.
+You can deploy the created package onto Inventit IoT Developer Network(IIDN) Sandbox Server.
+Visit [IIDN site](http://dev.yourinventit.com) 
 
-## License
+## Source Code License
 
-This library is dual-licensed under:
+All program source codes are available under the MIT style License.
 
-* [GNU GPL v2](http://www.gnu.org/licenses/gpl-2.0.txt)
-* Commercial License
+The use of IIDN service requires [our term of service](http://dev.yourinventit.com/legal/term-of-service).
 
-Copyright © 2012 Inventit Inc.
+Copyright (c) 2013 Inventit Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## Change History
 
+1.1.0 : February 4, 2013
+
+* Applies the latest API set changes
+* Synchronizes the project version with MOAT js API version
+* <code>nodeunit</code> and <code>sinon</code> are now mandatory
+* As of 1.1.0, the license is changed to the MIT style
+
 0.1.7 : December 10, 2012
+
 * Changes the link URLs in this file
  
 0.1.6 : September 28, 2012
+
 * Adds a new function to create an arbitrary type object into MessageSession class.
 * Changes Database class interfaces (insert(), update(), queryWithFilter(), queryByUid(), remove())
 
 0.1.5 : August 23, 2012
+
 * Introduces a new 'Database' type. The Database type provides methods to access an underlying cloud database managed by MOAT js runtime, which can be accessed from MOAT REST API as well.
 * Adds a new attribute 'database' to ClientRequest type. and a new function to create a stub Database object.
 * Modifies the attribute name of ClientRequest, from 'clientAlerts' to 'objects'.
@@ -136,21 +165,26 @@ Copyright © 2012 Inventit Inc.
 * Updates MOAT-js links (July 27, 2012)
 
 0.1.4 : July 24, 2012
+
 * Adds how to invoke a tested script in a test case on README.md.
 * Adds a new argument, 'block'(a function), to MessageSession object.
 * Fixes the wrong remove* and insert* function definitions.
 * Removes unused function definitions.
 
 0.1.3 : July 17, 2012
+
 * Adds a new function 'queryCount' to the MessageSession stubs.
 * Changes the function name, from 'selectUids' to 'queryUids' in the MessageSession stubs.
 
 0.1.2 : July 9, 2012
-* Fixes an issue where stubClientAlert, stubItemData, stubDmJob, and stubDevInfo didn't return SinonJS stub instances.
+
+* Fixes an issue where stubClientAlert, stubItemData, stubDmjob, and stubDevInfo didn't return SinonJS stub instances.
 * Updates the example test code, adding 'assert.equals(true, session.commit.called);' so to show how to verify if a method is executed.
 
 0.1.1 : July 1, 2012
+
 * Updates the git URL in the package.json.
 
 0.1.0 : June 29, 2012
+
 * Initial Release.
