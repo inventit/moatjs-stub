@@ -4,7 +4,7 @@ MOAT js Testing Library
 This is a [node.js](http://node.js) library enabling you to run MOAT js script files on your local machine rather than a cloud server.
 
 ## What is MOAT js?
-[MOAT js](http://dev.yourinventit.com/guides/moat-iot/moat-js) is a javascript API to build a server side application interacting with remote devices such as [OMA-DM](http://en.wikipedia.org/wiki/OMA_Device_Management) based devices, ZigBee devices and/or Android devices.
+[MOAT js](http://dev.yourinventit.com/guides/moat-iot/moat-js) is a javascript API to build a server side application interacting with remote devices.
 It is a part of [MOAT IoT](http://dev.yourinventit.com/guides/moat-iot), which is a specification set of creating IoT/M2M applications running on Inventit® ServiceSync environment.
 
 *****
@@ -21,85 +21,80 @@ Use [IIDN-CLI Tool](https://github.com/inventit/iidn-cli) to deploy created scri
 ## How to install
 
 For local projects:
-<pre>
-  your-project-root> npm install moat
-</pre>
+
+	your-project-root> npm install moat
 
 For installing globally:
-<pre>
-  anywhere> npm install moat -g
-</pre>
+
+	anywhere> npm install moat -g
 
 Then link related packages on your project root directory like this:
-<pre>
-  your-project-root> npm link moat nodeunit sinon
-</pre>
+
+	your-project-root> npm link moat nodeunit sinon
 
 ## How to use
 
 ### 1. Write the following code to get a MOAT js context object.
-<pre>
-  var moat = require('moat');
-  var context = moat.init();
-  var session = context.session;
-  var clientRequest = context.clientRequest;
+
+	var moat = require('moat');
+	var context = moat.init();
+	var session = context.session;
+	var clientRequest = context.clientRequest;
         :
         :
-</pre>
 
 ### 2. Save the script file and write a test code
 
 With [Sinon.JS](http://sinonjs.org/) and [NodeUnit](https://github.com/caolan/nodeunit), you can test your scripts like this:
-<pre>
-  var nodeUnit = require('nodeunit');
-  var sinon = require('sinon');
-  var script = require('path').resolve('./script.js');
-  var moat = require('moat');
 
-  module.exports = nodeUnit.testCase({
-    setUp: function(callback) {
-		// IMPORTANT
-		require.cache[script] = null;
-    	callback();
-    },
-    tearDown: function(callback) {
-    	callback();
-    },
-    'test your script.' : function(assert) {
-		// record state
-	    var context = moat.init(sinon);
-	    var arguments = {
-	        apps: JSON.stringify({
-	            objectNameArray: ["app-1.zip"]
-	        })
-	    };
-	    context.setDevice('uid', 'deviceId', 'name', 'status', 'clientVersion', 0);
-	    context.setDmjob('uid', 'deviceId', 'name', 'status', 'jobServiceId',
-				'sessionId', arguments, 'createAt', 'activateAt', 'startAt',
-				'expiredAt', 'http', 'http://localhost');
-	    var session = context.session;
-		session.findPackage.withArgs('app-1.zip').returns({
-			get: 'http://localhost/app-1.zip',
-			head: 'http://localhost/app-1.zip',
-			type: 'my-type'
-		});
+	var nodeUnit = require('nodeunit');
+	var sinon = require('sinon');
+	var script = require('path').resolve('./script.js');
+	var moat = require('moat');
 
-	    var mapper = session.newModelMapperStub('MyModel');
-		var model = mapper.newModelStub();
-		context.addCommand(model, 'myCommand',
-			context.newErrorCommandEvent('fatal_error', '12345'));
+	module.exports = nodeUnit.testCase({
+	    setUp: function(callback) {
+			// IMPORTANT
+			require.cache[script] = null;
+	    	callback();
+	    },
+	    tearDown: function(callback) {
+	    	callback();
+	    },
+	    'test your script.' : function(assert) {
+			// record state
+		    var context = moat.init(sinon);
+		    var arguments = {
+		        apps: JSON.stringify({
+		            objectNameArray: ["app-1.zip"]
+		        })
+		    };
+		    context.setDevice('uid', 'deviceId', 'name', 'status', 'clientVersion', 0);
+		    context.setDmjob('uid', 'deviceId', 'name', 'status', 'jobServiceId',
+					'sessionId', arguments, 'createAt', 'activateAt', 'startAt',
+					'expiredAt', 'http', 'http://localhost');
+		    var session = context.session;
+			session.findPackage.withArgs('app-1.zip').returns({
+				get: 'http://localhost/app-1.zip',
+				head: 'http://localhost/app-1.zip',
+				type: 'my-type'
+			});
 
-	    // Run the script (replay state)
-	    require(script);
+		    var mapper = session.newModelMapperStub('MyModel');
+			var model = mapper.newModelStub();
+			context.addCommand(model, 'myCommand',
+				context.newErrorCommandEvent('fatal_error', '12345'));
 
-	    // Assertion
-	    assert.equal(true, session.commit.called);
-		assert.equal(true, mapper.add.withArgs(model).called);
-		assert.equal(true, session.notifyAsync.called);
-	    assert.done();
-    }
-  });
-</pre>
+		    // Run the script (replay state)
+		    require(script);
+
+		    // Assertion
+		    assert.equal(true, session.commit.called);
+			assert.equal(true, mapper.add.withArgs(model).called);
+			assert.equal(true, session.notifyAsync.called);
+		    assert.done();
+	    }
+	});
 
 
 ### 3. Run the test code
@@ -112,12 +107,58 @@ With [Sinon.JS](http://sinonjs.org/) and [NodeUnit](https://github.com/caolan/no
 Here is an example test runner code with the latter way.
 
 #### test-suite-runner.js
-<pre>
-  var reporter = require('nodeunit').reporters.default;
-  reporter.run(['path/to/your/test/code.js']);
-</pre>
+
+	var reporter = require('nodeunit').reporters.default;
+	reporter.run(['path/to/your/test/code.js']);
 
 Simply you can type 'node *test-suite-runner.js*' so that you'll see the test results.
+
+#### Rakefile example (not jake)
+
+This is an example code snippet for [Rake](http://rake.rubyforge.org/) task.
+
+You can run all tests with `rake test` when you name them with `*.test.js` suffix.
+
+Prior to running tests, you may need to run `rake setup` to prepare related npm modules.
+
+	require 'rake/packagetask'
+
+	task :default => [:test]
+
+	#
+	# Setting up dependent modules
+	#
+	task :setup do
+	  system "npm link moat nodeunit sinon"
+	end
+
+	#
+	# Running NodeUnit Tests
+	#
+	task :test do
+	  runner = ""
+	  Dir.glob("*.test.js") do |f|
+	    runner += "\"#{f}\","
+	  end
+	  if runner.empty?
+	    puts "Nothing to test..."
+	    next
+	  else
+	    runner = "var reporter = require(\"nodeunit\").reporters.default;\nreporter.run([#{runner[0..-2]}]);"
+	  end
+	  puts "-------------Starting the following script-------------\n#{runner}"
+	  system "node -e '#{runner}'"
+	end
+
+	#
+	# Packaging MOAT js files (zip) for iidn jsdeploy command
+	#
+	# rake clobber_package package
+	#
+	Rake::PackageTask.new(File.basename(Dir.pwd), '1.0') do |p|
+	  p.need_zip = true
+	  p.package_files.include('*.js').exclude('*.test.js')
+	end
 
 ## Where can you deploy?
 
@@ -144,7 +185,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 * Applies the latest API set changes
 * Synchronizes the project version with MOAT js API version
-* <code>nodeunit</code> and <code>sinon</code> are now mandatory
+* `nodeunit` and `sinon` are now mandatory
 * As of 1.1.0, the license is changed to the MIT style
 
 0.1.7 : December 10, 2012
