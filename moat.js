@@ -293,7 +293,7 @@ function replay() {
 
     function prepare(token, block) {
         if (block) {
-            console.log('token-->' + token);
+            console.log('token-->' + token + ', block == null? => ' + (block == null));
             blocks.push(block);
             tokens.push(token);
         }
@@ -317,16 +317,55 @@ function replay() {
         fetchUrlSync: function(url, params, block) {
             return stub.fetchUrlSync(url, params, block);
         },
-        commit: function(commitState, block) {
-            var result = stub.commit(commitState, block);
+        commit: function(commitState, methodBlock) {
+            var result = stub.commit(commitState, methodBlock);
+			if (!result) {
+				console.log('INFO: commit() returns undefined.');
+				return null;
+			}
+			var interrupt = (result['event'] != null);
             for (var i = 0; i < blocks.length; i++) {
-                if (blocks[i]) {
-                    blocks[i](result[tokens[i]]);
+				var lb = blocks[i];
+                if (lb) {
+					var obj = result[tokens[i]];
+					if (!obj) {
+						console.log('INFO: Missing object for the token['
+							+ tokens[i] + '] in result[' + JSON.stringify(result) + ']');
+					}
+					if (interrupt) {
+						if (lb.interrupt) {
+							lb.interrupt(result['event']);
+							continue;
+						}
+					} else if (obj.errorType || obj.errorCode) {
+						if (lb.error) {
+							lb.error(obj.errorType, obj.errorCode);
+							continue;
+						}
+					} else {
+						if (lb.success) {
+							lb.success(obj);
+							continue;
+						}
+					}
                 }
             }
-            if (block) {
-                block(result);
-            }
+			if (methodBlock) {
+				if (interrupt) {
+					if (methodBlock.interrupt) {
+						return methodBlock.interrupt(result['event']);
+					}
+				} else {
+					if (methodBlock.success) {
+						return methodBlock.success(result);
+					}
+				}
+			} else {
+				if (interrupt) {
+					console.log('INTERRUPT: event => ' + result['event']);
+					throw result['event'];
+				}
+			}
             blocks = [];
             tokens = [];
             return result;
