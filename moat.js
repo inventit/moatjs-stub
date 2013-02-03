@@ -74,6 +74,9 @@ function record(sinon, packageJson) {
 							modelArrayHash[type] = modelArray;
 						}
 						var model = sinon.stub();
+						model.__type = function() {
+							return type;
+						};
 						modelArray.push(model);
 						return model;
 					}
@@ -121,6 +124,18 @@ function record(sinon, packageJson) {
 			
 			// For command operations
 			addCommand: function(entity, name, event) {
+				var type = entity.__type();
+				if (!type) {
+					throwError('entity must be a return value of newModelStub().');
+				}
+				var descriptor = packageJson.models[type];
+				if (!type) {
+					throwError('Unknown type:' + type);
+				}
+				var commands = descriptor.commands;
+				if (!commands || !commands[name]) {
+					throwError('Command :' + name + ' is NOT defined in the type:' + type);
+				}
 				entity[name] = function(session, parameter, block) {
 					session.commit();
 					if (block && block[event.id]) {
@@ -273,7 +288,14 @@ function record(sinon, packageJson) {
 };
 
 function loadPackageJson() {
-	return require(require('path').resolve('./package.json'));
+	var path = require('path');
+	var packageJson = require(path.resolve('./package.json'));
+	var currentPackageDir = path.basename(path.resolve('.'));
+	if (currentPackageDir != packageJson.name) {
+		throwError('Either the package directory name or "name" of the package.json is wrong. package.json:'
+			+ packageJson.name + ', Directory Name:' + currentPackageDir);
+	}
+	return packageJson;
 }
 
 function throwError(message) {

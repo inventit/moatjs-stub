@@ -186,6 +186,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 * Applies the latest API set changes
 * Synchronizes the project version with MOAT js API version
 * `nodeunit` and `sinon` are now mandatory
+* Checks if the parameter used in MessageSession.newModelMapperStub() is defined in package.json
+* Checks if the current directory name is same as 'name' property in pacakge.json
 * As of 1.1.0, the license is changed to the MIT style
 
 0.1.7 : December 10, 2012
