@@ -10,9 +10,11 @@
 exports.init = function(sinonObject) {
 	if (sinonObject) {
 		// recorded state (stub objects)
+		exports.replay = false;
 		exports.state = record(sinonObject, loadPackageJson());
 		return exports.state;
 	} else {
+		exports.replay = true;
 		return replay();
 	}
 }
@@ -39,7 +41,7 @@ function record(sinon, packageJson) {
 	            console.log('[' + tag + ']:' + message);
             };
 			var mapperHash = [];
-			var modelHash = [];
+			var modelArrayHash = [];
 			stub.newModelMapperStub = function(type) {
 				if (!packageJson.models[type]) {
 					throwError(type + ' is not defined in package.json!');
@@ -58,13 +60,23 @@ function record(sinon, packageJson) {
 					count: function(block) {}
 				});
 				mapper.newModelStub = function() {
-					var model = modelHash[type];
-					if (model) {
+					var modelArray = modelArrayHash[type];
+					if (exports.replay) {
+						if (!modelArray || modelArray.length == 0) {
+							console.log('No record for the model!, type:' + type);
+							throw "No record for the model!";
+						} else {
+							return modelArray.shift();
+						}
+					} else {
+						if (!modelArray) {
+							modelArray = [];
+							modelArrayHash[type] = modelArray;
+						}
+						var model = sinon.stub();
+						modelArray.push(model);
 						return model;
 					}
-					model = sinon.stub();
-					modelHash[type] = model;
-					return model;
 				};
 				mapperHash[type] = mapper;
 				return mapper;
