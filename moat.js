@@ -166,15 +166,15 @@ function record(sinon, packageJson) {
              * @param object jobServiceId
              * @param object sessionId
              * @param object arguments
-             * @param object createAt
-             * @param object activateAt
-             * @param object startAt
+             * @param object createdAt
+             * @param object activatedAt
+             * @param object startedAt
              * @param object expiredAt
              * @param object notificationType
              * @param object notificationUri
              * @return object (Dmjob)
              */
-            setDmjob: function(uid, deviceId, name, status, jobServiceId, sessionId, arguments, createAt, activateAt, startAt, expiredAt, notificationType, notificationUri) {
+            setDmjob: function(uid, deviceId, name, status, jobServiceId, sessionId, arguments, createdAt, activatedAt, startedAt, expiredAt, notificationType, notificationUri) {
                 if (uid) {
 					clientRequest.dmjob = {
 					    uid: uid,
@@ -184,9 +184,9 @@ function record(sinon, packageJson) {
 		                jobServiceId: jobServiceId,
 		                sessionId: sessionId,
 		                arguments: arguments,
-		                createAt: createAt,
-		                activateAt: activateAt,
-		                startAt: startAt,
+		                createdAt: createdAt,
+		                activatedAt: activatedAt,
+		                startedAt: startedAt,
 		                expiredAt: expiredAt,
 		                notificationType: notificationType,
 		                notificationUri: notificationUri
