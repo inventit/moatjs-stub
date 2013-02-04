@@ -2,8 +2,9 @@
     "author": {
 		"name": "Daisuke Baba",
 		"email": "dbaba@yourinventit.com",
-		"url": "http://dev.yourinventit.com"
-	}, 
+		"url": "https://plus.google.com/106997729331553608593/posts"
+	},
+	"homepage" : "http://dev.yourinventit.com"
     "description": "MOAT js Testing Library for Node.js", 
     "main": "./moat", 
     "name": "moat", 
