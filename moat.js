@@ -37,6 +37,9 @@ function record(sinon, packageJson) {
 				findPackage: function(objectName) {},
 				setDmjobArgument: function(name, value) {}
             });
+			// applicationId is NOT included in package.json.
+			stub.applicationId = 'applicationId';
+			stub.packageId = packageJson.name
             stub.log = function(tag, message) {
 	            console.log('[' + tag + ']:' + message);
             };
