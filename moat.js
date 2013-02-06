@@ -330,6 +330,8 @@ function replay() {
 	}
 	var stub = state.session;
     state.session = {
+		applicationId: stub.applicationId,
+		packageId: stub.packageId,
         setWaitingForResultNotification: function(tf) {
             return stub.setWaitingForResultNotification(tf);
         },
