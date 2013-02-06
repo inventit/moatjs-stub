@@ -181,7 +181,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Change History
 
-1.1.0 : February 4, 2013
+1.1.0 : February 6, 2013
 
 * Applies the latest API set changes
 * Synchronizes the project version with MOAT js API version
