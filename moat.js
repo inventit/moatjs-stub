@@ -1,372 +1,441 @@
 /*
  * MOAT js Testing Library for Node.js
  * 
- * Copyright 2012 © Inventit Inc.
+ * Copyright 2013 © Inventit Inc.
  */
-
 
 /**
- * Dummy implementation of init(). Not depending on Sinon JS and nodeunit.
+ * MOAT.init()
  */
-exports.init = function() {
-    var session = (function() {
-        var waitForResultNotification = false;
-        var result = {};
-
-        function prepareResult(token) {
-            result[token] = {
-                childNodes: null,
-            };
-            return token;
-        }
-        return {
-            log: function(message) {
-                console.log(message);
-            },
-            querySingleton: function(type, block) {
-                return prepareResult('querySingleton(' + type + ', ' + block + ')');
-            },
-            queryByUid: function(type, uid, block) {
-                return prepareResult('queryByUid(' + type + ',' + uid + ', ' + block + ')');
-            },
-            query: function(type, block) {
-                return prepareResult('query(' + type + ', ' + block + ')');
-            },
-            queryUids: function(type, block) {
-                return prepareResult('queryUids(' + type + ', ' + block + ')');
-            },
-            queryCount: function(type, block) {
-                return prepareResult('queryCount(' + type + ', ' + block + ')');
-            },
-            updateSingletonField: function(type, fieldName, fieldValue, block) {
-                return prepareResult('updateSingletonField(' + type + ',' + fieldName + ',' + fieldValue + ', ' + block + ')');
-            },
-            updateField: function(type, uid, fieldName, fieldValue, block) {
-                return prepareResult('updateField(' + type + ',' + uid + ',' + fieldName + ',' + fieldValue + ', ' + block + ')');
-            },
-            updateSingleton: function(type, entity, block) {
-                return prepareResult('updateSingleton(' + type + ',' + entity + ', ' + block + ')');
-            },
-            update: function(type, uid, entity, block) {
-                return prepareResult('update(' + type + ',' + uid + ',' + entity + ', ' + block + ')');
-            },
-            insert: function(type, uid, entity, block) {
-                return prepareResult('insert(' + type + ',' + uid + ',' + entity + ', ' + block + ')');
-            },
-            remove: function(type, uid, block) {
-                return prepareResult('remove(' + type + ',' + uid + ', ' + block + ')');
-            },
-            runSingleton: function(type, operationName, data, block) {
-                return prepareResult('runSingleton(' + type + ',' + operationName + ',' + data + ', ' + block + ')');
-            },
-            run: function(type, operationName, data, block) {
-                return prepareResult('run(' + type + ',' + operationName + ',' + data + ', ' + block + ')');
-            },
-            setWaitingForResultNotification: function(tf) {
-                waitForResultNotification = tf;
-            },
-            // Not a public method, just for testing.
-            isWaitingForResultNotification: function() {
-                return waitForResultNotification;
-            },
-            commit: function(commitState, methodBlock) {
-                var ret = result;
-                result = {};
-                return ret;
-            },
-            notifySync: function(entity, methodBlock) {
-                if (typeof(entity) != 'object') {
-                    throw 'The value must be an object.';
-                }
-                return {};
-            },
-            notifyAsync: function(entity) {
-                if (typeof(entity) != 'object') {
-                    throw 'The value must be an object.';
-                }
-                return {};
-            },
-            fetchUrlSync: function(url, params, methodBlock) {
-                if (url.indexof('http:') == 0 || url.indexof('https:') == 0) {
-                    return {};
-                } else {
-                    throw "Unsupported protocol scheme. URL=" + url;
-                }
-            },
-        }
-    }());
-    var now = new Date().toUTCString();
-    return {
-        session: session,
-        clientRequest: {
-            objects: null,
-            devInfo: {
-                deviceId: 'deviceId',
-                manufacturer: 'manufacturer',
-                model: 'model',
-                dmVersion: 'dmVersion',
-                language: 'language',
-            },
-            dmJob: {
-                uid: 'uid',
-                activateTimestamp: now,
-                createTimestamp: now,
-                expiredTimestamp: now,
-                startTimestamp: now,
-                deviceId: 'deviceId',
-                notificationType: 'notificationType',
-                notificationUri: 'notificationUri',
-                postedBy: 'postedBy',
-                pushAddress: 'pushAddress',
-                pushAddressType: 'pushAddressType',
-                pushType: 'pushType',
-                regionCode: 'regionCode',
-                serviceId: 'serviceId',
-                sessionId: 0xfff,
-                status: 'status',
-                arguments: null
-            },
-            database: database
-        }
-    };
-};
+exports.init = function(sinonObject) {
+	if (sinonObject) {
+		// recorded state (stub objects)
+		exports.replay = false;
+		exports.state = record(sinonObject, loadPackageJson());
+		return exports.state;
+	} else {
+		exports.replay = true;
+		return replay();
+	}
+}
 
 /**
- * Creates a factory instance to instantiate stub objects with Sinon.JS.
+ * Returns a factory object to instantiate SinonJS stub object
  *
- * You need to install Sinon.JS to use this function.
- *
- * @param object sinonObject
+ * @param object sinon
+ * @param object packageJson
  */
-exports.initSinon = function(sinonObject) {
+function record(sinon, packageJson) {
     return (function() {
-        var sinon = sinonObject;
-        var stubContext = {
-            session: null,
-            clientRequest: null,
+		var session = (function() {
+            var stub = sinon.stub({
+                setWaitingForResultNotification: function(tf) {},
+                commit: function(commitState, block) {},
+                notifySync: function(entity, block) {},
+                notifyAsync: function(entity) {},
+                fetchUrlSync: function(url, params, block) {},
+				findPackage: function(objectName) {},
+				setDmjobArgument: function(name, value) {}
+            });
+			// applicationId is NOT included in package.json.
+			stub.applicationId = 'applicationId';
+			stub.packageId = packageJson.name
+            stub.log = function(tag, message) {
+	            console.log('[' + tag + ']:' + message);
+            };
+			var mapperHash = [];
+			var modelArrayHash = [];
+			stub.newModelMapperStub = function(type) {
+				if (!packageJson.models[type]) {
+					throwError(type + ' is not defined in package.json!');
+				}
+				var mapper = mapperHash[type];
+				if (mapper) {
+					return mapper;
+				}
+				mapper = sinon.stub({
+					add: function(entity, block) {},
+					update: function(entity, block) {},
+					updateFields: function(entity, fields, block) {},
+					remove: function(uid, block) {},
+					findByUid: function(uid, block) {},
+					findAllUids: function(block) {},
+					count: function(block) {}
+				});
+				mapper.newModelStub = function() {
+					var modelArray = modelArrayHash[type];
+					if (exports.replay) {
+						if (!modelArray || modelArray.length == 0) {
+							console.log('No record for the model!, type:' + type);
+							throw "No record for the model!";
+						} else {
+							return modelArray.shift();
+						}
+					} else {
+						if (!modelArray) {
+							modelArray = [];
+							modelArrayHash[type] = modelArray;
+						}
+						var model = sinon.stub();
+						model.__type = function() {
+							return type;
+						};
+						modelArray.push(model);
+						return model;
+					}
+				};
+				mapperHash[type] = mapper;
+				return mapper;
+			};
+            return stub;
+        })();
+		var clientRequest = {
+            objects: null,
+            device: null,
+            dmjob: null,
         };
+		var database = sinon.stub({
+            insert: function(entity) {},
+            update: function(entity) {},
+            remove: function(type, uids) {},
+            query: function(type, offsetOrToken, limit) {},
+            queryByUids: function(type, uids, f, r) {},
+            querySharedByUids: function(type, uids, f, r) {}
+        });
         var context = {
             /**
-             * Not a factory method.
+             * MessageSession stub object.
              */
-            getStubContext: function() {
-                return stubContext;
-            },
+            session: session,
 
             /**
-             * A factory method for MessageSession stub object.
-             */
-            stubMessageSession: function() {
-                var stub = sinon.stub({
-                    querySingleton: function(type, block) {},
-                    queryByUid: function(type, uid, block) {},
-                    query: function(type, block) {},
-                    queryUids: function(type, block) {},
-                    queryCount: function(type, block) {},
-                    updateSingletonField: function(type, fieldName, fieldValue, block) {},
-                    updateField: function(type, uid, fieldName, fieldValue, block) {},
-                    updateSingleton: function(type, entity, block) {},
-                    update: function(type, uid, entity, block) {},
-                    insert: function(type, uid, entity, block) {},
-                    remove: function(type, uid, block) {},
-                    runSingleton: function(type, operationName, data, block) {},
-                    run: function(type, operationName, data, block) {},
-                    setWaitingForResultNotification: function(tf) {},
-                    commit: function(commitState, block) {},
-                    notifySync: function(entity, block) {},
-                    notifyAsync: function(entity) {},
-                    fetchUrlSync: function(url, params, block) {},
-                    newObject: function(type) {},
-                });
-
-                stub.log = function(message) {
-                    console.log(message);
-                };
-                return stub;
-            },
-
-            /**
-             * A factory method for ClientRequest stub object.
+             * Returns ClientRequest stub object.
              *
-             * @param Array objects
-             * @param object:stubDevInfo() devInfo
-             * @param object:stubDmJob() dmJob
              * @return object (ClientRequest)
              */
-            stubClientRequest: function(objects, devInfo, dmJob) {
-                return {
-                    objects: objects,
-                    devInfo: devInfo,
-                    dmJob: dmJob,
-                };
-            },
+			clientRequest: clientRequest,
 
             /**
-             * A factory method for DevInfo stub object.
-             *
-             * @param String deviceId
-             * @param String manufacturer
-             * @param String model
-             * @param String dmVersion
-             * @param String language
-             * @return object (DevInfo)
-             */
-            stubDevInfo: function(deviceId, manufacturer, model, dmVersion, language) {
-                return sinon.stub({
-                    deviceId: deviceId,
-                    manufacturer: manufacturer,
-                    model: model,
-                    dmVersion: dmVersion,
-                    language: language,
-                });
-            },
-
-            /**
-             * A factory method for DmJob stub object.
-             *
-             * @param object arguments
-             * @return object (DmJob)
-             */
-            stubDmJob: function(arguments) {
-                return sinon.stub({
-                    uid: null,
-                    activateTimestamp: null,
-                    createTimestamp: null,
-                    expiredTimestamp: null,
-                    startTimestamp: null,
-                    deviceId: null,
-                    notificationType: null,
-                    notificationUri: null,
-                    postedBy: null,
-                    pushAddress: null,
-                    pushAddressType: null,
-                    pushType: null,
-                    regionCode: null,
-                    serviceId: null,
-                    sessionId: null,
-                    status: null,
-                    arguments: arguments
-                });
-            },
-
-            /**
-             * A factory method for ItemData stub object.
-             *
-             * @param String status
-             * @return object (ItemData)
-             */
-            stubItemData: function(status) {
-                return sinon.stub({
-                    status: status,
-                });
-            },
-
-            /**
-             * A factory method for Database stub object.
+             * Returns Database stub object.
              *
              * @return object (Database)
              */
-            stubDatabase: function() {
-                return sinon.stub({
-                    insert: function(entity) {},
-                    update: function(entity) {},
-                    remove: function(type, uids) {},
-                    query: function(type, offsetOrToken, limit) {},
-                    queryWithFilter: function(type, offsetOrToken, limit, filter) {},
-                    queryByUids: function(type, uids) {},
-                });
+			database: database,
+			
+			// packageJson (internal property)
+			packageJson: packageJson,
+			
+			// For command operations
+			addCommand: function(entity, name, event) {
+				var type = entity.__type();
+				if (!type) {
+					throwError('entity must be a return value of newModelStub().');
+				}
+				var descriptor = packageJson.models[type];
+				if (!type) {
+					throwError('Unknown type:' + type);
+				}
+				var commands = descriptor.commands;
+				if (!commands || !commands[name]) {
+					throwError('Command :' + name + ' is NOT defined in the type:' + type);
+				}
+				entity[name] = function(session, parameter, block) {
+					session.commit();
+					if (block && block[event.id]) {
+						block[event.id].apply({}, event.args);
+					}
+				}
+			},
+			
+			// clientRequest attributes manipulation
+            /**
+             * A setter method for Device object.
+             *
+             * @param Array objects
+             * @return objects (Array)
+             */
+			setObjects: function(objects) {
+				clientRequest.objects = objects;
+				return objects;
+			},
+			
+            /**
+             * A setter method for Device object.
+             *
+             * @param String uid
+             * @param String deviceId
+             * @param String name
+             * @param String status
+             * @param String clientVerion
+             * @param Number rev
+             * @return object (Device)
+             */
+            setDevice: function(uid, deviceId, name, status, clientVersion, rev) {
+				if (uid) {
+	                clientRequest.device = {
+						uid: uid,
+	                    deviceId: deviceId,
+		                name: name,
+		                status: status,
+		                clientVersion: clientVersion,
+		                rev: rev
+	                };
+				} else {
+	                clientRequest.device = null;
+				}
+				return clientRequest.device;
             },
-        };
-        // Overwrite the default init() method.
-        exports.init = function() {
-            var blocks = [];
-            var tokens = [];
 
-            function prepare(token, block) {
-                if (block) {
-                    console.log('token-->' + token);
-                    blocks.push(block);
-                    tokens.push(token);
-                }
-                return token;
+            /**
+             * A setter method for Dmjob object.
+             *
+             * @param object uid
+             * @param object deviceId
+             * @param object name
+             * @param object status
+             * @param object jobServiceId
+             * @param object sessionId
+             * @param object arguments
+             * @param object createdAt
+             * @param object activatedAt
+             * @param object startedAt
+             * @param object expiredAt
+             * @param object notificationType
+             * @param object notificationUri
+             * @return object (Dmjob)
+             */
+            setDmjob: function(uid, deviceId, name, status, jobServiceId, sessionId, arguments, createdAt, activatedAt, startedAt, expiredAt, notificationType, notificationUri) {
+                if (uid) {
+					clientRequest.dmjob = {
+					    uid: uid,
+		                deviceId: deviceId,
+		                name: name,
+		                status: status,
+		                jobServiceId: jobServiceId,
+		                sessionId: sessionId,
+		                arguments: arguments,
+		                createdAt: createdAt,
+		                activatedAt: activatedAt,
+		                startedAt: startedAt,
+		                expiredAt: expiredAt,
+		                notificationType: notificationType,
+		                notificationUri: notificationUri
+	                };
+				} else {
+					clientRequest.dmjob = null;
+				}
+				return clientRequest.dmjob;
+            },
+
+			// factory function
+            /**
+             * A factory method for an event object used for addCommand().
+             *
+             * @param Boolean async
+             * @param Array array
+             * @return object
+             */
+            newSuccessfulCommandEvent: function(async, array) {
+                return {
+					id: 'success',
+					args: [{
+	                    success: true,
+	                    async: async,
+	                    array: array
+	                }]
+				};
+            },
+            /**
+            * A factory method for an event object used for addCommand().
+             *
+             * @param String code
+             * @param String type
+             * @return object
+             */
+            newErrorCommandEvent: function(code, type) {
+                return {
+					id: 'error',
+					args: [code, type]
+				};
+            },
+            /**
+            * A factory method for an event object used for addCommand().
+             *
+             * @param String eventId
+             * @return object
+             */
+            newIntrruptCommandEvent: function(eventId) {
+                return {
+					id: 'interrupt',
+					args: [eventId]
+				};
+            },
+            /**
+             * A factory method for QueryResult stub object.
+             *
+             * @param Array array
+             * @param String offset
+             * @param int limit
+             * @return object (QueryResult)
+             */
+            newQueryResult: function(array, offset, limit) {
+                return {
+                    array: array,
+                    offset: offset,
+                    limit: limit
+                };
             }
-            var stub = stubContext.session;
-            stubContext.session = {
-                querySingleton: function(type, block) {
-                    return prepare(stub.querySingleton(type, block), block);
-                },
-                queryByUid: function(type, uid, block) {
-                    return prepare(stub.queryByUid(type, uid, block), block);
-                },
-                query: function(type, block) {
-                    return prepare(stub.query(type, block), block);
-                },
-                queryUids: function(type, block) {
-                    return prepare(stub.queryUids(type, block), block);
-                },
-                queryCount: function(type, block) {
-                    return prepare(stub.queryCount(type, block), block);
-                },
-                updateSingletonField: function(type, fieldName, fieldValue, block) {
-                    return prepare(stub.updateSingletonField(type, fieldName, fieldValue, block), block)
-                },
-                updateField: function(type, uid, fieldName, fieldValue, block) {
-                    return prepare(stub.updateField(type, uid, fieldName, fieldValue, block), block);
-                },
-                updateSingleton: function(type, entity, block) {
-                    return prepare(stub.updateSingleton(type, entity, block), block);
-                },
-                update: function(type, uid, entity, block) {
-                    return prepare(stub.update(type, uid, entity, block), block);
-                },
-                insert: function(type, uid, entity, block) {
-                    return prepare(stub.insert(type, uid, entity, block), block);
-                },
-                remove: function(type, uid, block) {
-                    return prepare(stub.remove(type, uid, block), block);
-                },
-                runSingleton: function(type, operationName, data, block) {
-                    return prepare(stub.runSingleton(type, operationName, data, block), block);
-                },
-                run: function(type, uid, operationName, data, block) {
-                    return prepare(stub.run(type, uid, operationName, data, block), block)
-                },
-                setWaitingForResultNotification: function(tf) {
-                    return stub.setWaitingForResultNotification(tf);
-                },
-                notifySync: function(entity, block) {
-                    return stub.notifySync(entity, block);
-                },
-                notifyAsync: function(entity) {
-                    return stub.notifyAsync(entity);
-                },
-                fetchUrlSync: function(url, params, block) {
-                    return stub.fetchUrlSync(url, params, block);
-                },
-                commit: function(commitState, block) {
-                    var result = stub.commit(commitState, block);
-                    for (var i = 0; i < blocks.length; i++) {
-                        if (blocks[i]) {
-                            blocks[i](result[tokens[i]]);
-                        }
-                    }
-                    if (block) {
-                        block(result);
-                    }
-                    blocks = [];
-                    tokens = [];
-                    return result;
-                },
-                log: function(message) {
-                    console.log(message);
-                },
-                newObject: function(type) {
-                    return stub.newObject(type);
-                },
-            };
-
-            return stubContext;
         };
         return context;
     })();
+};
+
+function loadPackageJson() {
+	var path = require('path');
+	var packageJson = require(path.resolve('./package.json'));
+	var currentPackageDir = path.basename(path.resolve('.'));
+	if (currentPackageDir != packageJson.name) {
+		throwError('Either the package directory name or "name" of the package.json is wrong. package.json:'
+			+ packageJson.name + ', Directory Name:' + currentPackageDir);
+	}
+	return packageJson;
+}
+
+function throwError(message) {
+	console.trace('[ERROR] ' + message);
+	throw message;
+}
+
+/**
+ * Returns the root stub object.
+ * This function should be invoked after tweaking sinon stubs.
+ *
+ * @param object sinonContext
+ */
+function replay() {
+    var blocks = [];
+    var tokens = [];
+
+    function prepare(token, block) {
+        if (block) {
+            console.log('token-->' + token + ', block == null? => ' + (block == null));
+            blocks.push(block);
+            tokens.push(token);
+        }
+        return token;
+    }
+    var state = exports.state;
+	if (!state) {
+		throw "Invalid State. Invoke init(sinon) at first!";
+	}
+	var stub = state.session;
+    state.session = {
+		applicationId: stub.applicationId,
+		packageId: stub.packageId,
+        setWaitingForResultNotification: function(tf) {
+            return stub.setWaitingForResultNotification(tf);
+        },
+        notifySync: function(entity, block) {
+            return stub.notifySync(entity, block);
+        },
+        notifyAsync: function(entity) {
+            return stub.notifyAsync(entity);
+        },
+        fetchUrlSync: function(url, params, block) {
+            return stub.fetchUrlSync(url, params, block);
+        },
+        commit: function(commitState, methodBlock) {
+            var result = stub.commit(commitState, methodBlock);
+			if (!result) {
+				console.log('INFO: commit() returns undefined.');
+				return null;
+			}
+			var interrupt = (result['event'] != null);
+            for (var i = 0; i < blocks.length; i++) {
+				var lb = blocks[i];
+                if (lb) {
+					var obj = result[tokens[i]];
+					if (!obj) {
+						console.log('INFO: Missing object for the token['
+							+ tokens[i] + '] in result[' + JSON.stringify(result) + ']');
+					}
+					if (interrupt) {
+						if (lb.interrupt) {
+							lb.interrupt(result['event']);
+							continue;
+						}
+					} else if (obj.errorType || obj.errorCode) {
+						if (lb.error) {
+							lb.error(obj.errorType, obj.errorCode);
+							continue;
+						}
+					} else {
+						if (lb.success) {
+							lb.success(obj);
+							continue;
+						}
+					}
+                }
+            }
+			if (methodBlock) {
+				if (interrupt) {
+					if (methodBlock.interrupt) {
+						return methodBlock.interrupt(result['event']);
+					}
+				} else {
+					if (methodBlock.success) {
+						return methodBlock.success(result);
+					}
+				}
+			} else {
+				if (interrupt) {
+					console.log('INTERRUPT: event => ' + result['event']);
+					throw result['event'];
+				}
+			}
+            blocks = [];
+            tokens = [];
+            return result;
+        },
+        log: function(tag, message) {
+            console.log('[' + tag + ']:' + message);
+        },
+		findPackage: function(objectName) {
+			return stub.findPackage(objectName);
+		},
+		setDmjobArgument: function(name, value) {
+			return stub.setDmjobArgument(name, value);
+		},
+        newModelMapperStub: function(type) {
+			var mapper = stub.newModelMapperStub(type);
+            return {
+                add: function(entity, block) {
+                    return prepare(mapper.add(entity, block), block);
+                },
+                update: function(entity, block) {
+                    return prepare(mapper.update(entity, block), block);
+                },
+                updateFields: function(entity, fields, block) {
+                    return prepare(mapper.updateFields(entity, fields, block), block);
+                },
+                remove: function(uid, block) {
+                    return prepare(mapper.remove(uid, block), block);
+                },
+                findByUid: function(uid, block) {
+                    return prepare(mapper.findByUid(uid, block), block);
+                },
+                findAllUids: function(block) {
+                    return prepare(mapper.findAllUids(block), block);
+                },
+                count: function(block) {
+                    return prepare(mapper.count(block), block);
+                },
+                newModelStub: function() {
+                    return mapper.newModelStub();
+                }
+			};
+        },
+    };
+
+    return state;
 };
