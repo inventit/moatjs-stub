@@ -35,7 +35,13 @@ function record(sinon, packageJson) {
                 notifyAsync: function(entity) {},
                 fetchUrlSync: function(url, params, block) {},
 				findPackage: function(objectName) {},
-				setDmjobArgument: function(name, value) {}
+				setDmjobArgument: function(name, value) {},
+				digest: function(algorithm, encoding, value) {},
+				hmac: function(algorithm, encoding, secret, value) {},
+				hex2b64: function(hex) {},
+				b642hex: function(b64) {},
+				text2b64: function(arg1, arg2) {},
+				text2hex: function(arg1, arg2) {}
             });
 			// applicationId is NOT included in package.json.
 			stub.applicationId = 'applicationId';
@@ -405,6 +411,24 @@ function replay() {
 		},
 		setDmjobArgument: function(name, value) {
 			return stub.setDmjobArgument(name, value);
+		},
+		digest: function(algorithm, encoding, value) {
+			return stub.digest(algorithm, encoding, value);
+		},
+		hmac: function(algorithm, encoding, secret, value) {
+			return stub.hmac(algorithm, encoding, secret, value);
+		},
+		hex2b64: function(hex) {
+			return stub.hex2b64(hex);
+		},
+		b642hex: function(b64) {
+			return stub.b642hex(b64);
+		},
+		text2hex: function(arg1, arg2) {
+			return stub.text2hex(arg1, arg2);
+		},
+		text2b64: function(arg1, arg2) {
+			return stub.text2b64(arg1, arg2);
 		},
         newModelMapperStub: function(type) {
 			var mapper = stub.newModelMapperStub(type);
