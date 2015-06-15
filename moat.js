@@ -298,13 +298,7 @@ function record(sinon, packageJson) {
 
 function loadPackageJson() {
 	var path = require('path');
-	var packageJson = require(path.resolve('./package.json'));
-	var currentPackageDir = path.basename(path.resolve('.'));
-	if (currentPackageDir != packageJson.name) {
-		throwError('Either the package directory name or "name" of the package.json is wrong. package.json:'
-			+ packageJson.name + ', Directory Name:' + currentPackageDir);
-	}
-	return packageJson;
+	return require(path.resolve('./package.json'));
 }
 
 function throwError(message) {
