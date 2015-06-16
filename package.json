@@ -1,20 +1,20 @@
 {
-    "author": {
-		"name": "Daisuke Baba",
-		"email": "dbaba@yourinventit.com",
-		"url": "https://plus.google.com/106997729331553608593/posts"
-	},
-	"homepage" : "http://dev.yourinventit.com",
-    "description": "MOAT js Testing Library for Node.js", 
-    "main": "./moat", 
-    "name": "moat", 
-    "repository": {
-        "type": "git", 
-        "url": "git://github.com/inventit/moatjs-stub.git"
-    },
-	"devDependencies": {
-	    "nodeunit": ">= 0.7.4",
-	    "sinon": ">= 1.5.2"
-	  },
-    "version": "1.2.0"
+  "author": {
+    "name": "Daisuke Baba",
+    "email": "dbaba@yourinventit.com",
+    "url": "https://plus.google.com/106997729331553608593/posts"
+  },
+  "homepage" : "http://dev.yourinventit.com",
+  "description": "MOAT js Testing Library for Node.js", 
+  "main": "./moat", 
+  "name": "moat", 
+  "repository": {
+    "type": "git", 
+    "url": "git://github.com/inventit/moatjs-stub.git"
+  },
+  "devDependencies": {
+    "nodeunit": ">= 0.7.4",
+    "sinon": ">= 1.5.2"
+  },
+  "version": "1.2.0"
 }
