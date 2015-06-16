@@ -4,6 +4,9 @@
  * Copyright 2013 © Inventit Inc.
  */
 
+var assert = require('assert'),
+    crypto = require('crypto');
+
 /**
  * MOAT.init()
  */
@@ -35,19 +38,103 @@ function record(sinon, packageJson) {
         notifyAsync: function(entity) {},
         fetchUrlSync: function(url, params, block) {},
         findPackage: function(objectName) {},
-        setDmjobArgument: function(name, value) {},
-        digest: function(algorithm, encoding, value) {},
-        hmac: function(algorithm, encoding, secret, value) {},
-        hex2b64: function(hex) {},
-        b642hex: function(b64) {},
-        text2b64: function(arg1, arg2) {},
-        text2hex: function(arg1, arg2) {}
+        setDmjobArgument: function(name, value) {}
       });
       // applicationId is NOT included in package.json.
       stub.applicationId = 'applicationId';
       stub.packageId = packageJson.name;
       stub.log = function(tag, message) {
         console.log('[' + tag + ']:' + message);
+      };
+      stub.digest = function(algorithm, encoding, value) {
+        assert(algorithm, 'Set the algorithm, one of MD5, SHA1, or SHA256 is available.');
+        assert(algorithm === 'MD5' || algorithm === 'SHA1' || algorithm === 'SHA256',
+               'Set the algorithm, one of MD5, SHA1, or SHA256 is available.');
+        assert(encoding, 'Set the encoding, one of hex, b64 or plain is available.');
+        assert(encoding === 'hex' || encoding === 'b64' || encoding === 'plain',
+               'Set the encoding, one of hex, b64 or plain is available.');
+        assert(value, 'value is missing.');
+        assert(typeof(value) === 'string', 'value should be string.');
+        var shasum = crypto.createHash(algorithm);
+        shasum.update(value);
+        var digest = null;
+        switch (encoding) {
+          default:
+        case 'hex':
+          digest = shasum.digest('hex');
+          break;
+        case 'b64':
+          digest = shasum.digest('base64');
+          break;
+        case 'plain':
+          digest = shasum.digest('binary').toString('utf8');
+          break;
+        }
+        return digest;
+      };
+      stub.hmac = function(algorithm, encoding, secret, value) {
+        assert(algorithm, 'Set the algorithm, one of MD5, SHA1, or SHA256 is available.');
+        assert(algorithm === 'MD5' || algorithm === 'SHA1' || algorithm === 'SHA256',
+               'Set the algorithm, one of MD5, SHA1, or SHA256 is available.');
+        assert(encoding, 'Set the encoding, one of hex, b64 or plain is available.');
+        assert(encoding == 'hex' || encoding == 'b64' || encoding == 'plain',
+               'Set the encoding, one of hex, b64 or plain is available.');
+        assert(secret, 'secret is missing.');
+        assert(typeof(secret) === 'string', 'secret should be string.');
+        assert(value, 'value is missing');
+        assert(typeof(value) === 'string', 'value should be string.');
+        var shasum = crypto.createHmac(algorithm, secret);
+        shasum.update(value);
+        var digest = null;
+        switch (encoding) {
+          default:
+        case 'hex':
+          digest = shasum.digest('hex');
+          break;
+        case 'b64':
+          digest = shasum.digest('base64');
+          break;
+        case 'plain':
+          digest = shasum.digest('binary').toString('utf8');
+          break;
+        }
+        return digest;
+      };
+			stub.hex2b64 = function(hex) {
+        assert(hex, 'hex is missing.');
+        assert(typeof(hex) === 'string', 'hex should be string.');
+        var buf = new Buffer(hex, 'hex');
+        return buf.toString('base64');
+      };
+			stub.b642hex = function(b64) {
+        assert(b64, 'b64 is missing.');
+        assert(typeof(b64) === 'string', 'b64 should be string.');
+        var buf = new Buffer(b64, 'base64');
+        return buf.toString('hex');
+      };
+      function text2_(target, arg1, arg2) {
+        var text = null,
+            encoding = 'utf8',
+            format = target;
+        if (arg2) {
+          text = arg2;
+          encoding = arg1;
+        } else {
+          assert(arg1, 'text is missing.');
+          text = arg1;
+        }
+        assert(typeof(text) === 'string', 'text should be string.');
+        if (format === 'b64') {
+          format = 'base64';
+        }
+        var buf = new Buffer(text, encoding);
+        return buf.toString(format);
+      }
+			stub.text2b64 = function(arg1, arg2) {
+        return text2_('b64', arg1, arg2);
+      };
+			stub.text2hex = function(arg1, arg2) {
+        return text2_('hex', arg1, arg2);
       };
       var mapperHash = [];
       var modelArrayHash = [];
