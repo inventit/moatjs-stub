@@ -181,6 +181,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Change History
 
+1.2.1 : June 24, 2015
+
+* Unstabbed utility functions
+
 1.2.0 : June 5, 2013
 
 * Adds new functions for calculating a message digest value and an hmac value to MessageSession object
