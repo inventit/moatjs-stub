@@ -181,6 +181,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Change History
 
+1.2.2 : July 15, 2015
+
+* Fixed issues
+  * [#2](https://github.com/inventit/moatjs-stub/issues/2)
+
 1.2.1 : June 24, 2015
 
 * Unstabbed utility functions

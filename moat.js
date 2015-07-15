@@ -225,7 +225,7 @@ function record(sinon, packageJson) {
           throwError('entity must be a return value of newModelStub().');
         }
         var descriptor = packageJson.models[type];
-        if (!type) {
+        if (!descriptor) {
           throwError('Unknown type:' + type);
         }
         var commands = descriptor.commands;
