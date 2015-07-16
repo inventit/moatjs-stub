@@ -532,6 +532,9 @@ function replay() {
     text2b64: function(arg1, arg2) {
       return stub.text2b64(arg1, arg2);
     },
+    b642text: function(arg1, arg2) {
+      return stub.b642text(arg1, arg2);
+    },
     newModelMapperStub: function(type) {
       var mapper = stub.newModelMapperStub(type);
       return {
