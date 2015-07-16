@@ -130,8 +130,29 @@ function record(sinon, packageJson) {
         var buf = new Buffer(text, encoding);
         return buf.toString(format);
       }
+      function textFrom_(target, arg1, arg2) {
+        var str = null,
+            encoding = 'utf8',
+            format = target;
+        if (arg2) {
+          str = arg2;
+          encoding = arg1;
+        } else {
+          assert(arg1, target + ' is missing.');
+          str = arg1;
+        }
+        assert(typeof(str) === 'string', target + ' should be string.');
+        if (format === 'b64') {
+          format = 'base64';
+        }
+        var buf = new Buffer(str, format);
+        return buf.toString(encoding);
+      }      
 			stub.text2b64 = function(arg1, arg2) {
         return text2_('b64', arg1, arg2);
+      };
+      stub.b642text = function(arg1, arg2) {
+        return textFrom_('b64', arg1, arg2);
       };
 			stub.text2hex = function(arg1, arg2) {
         return text2_('hex', arg1, arg2);
@@ -510,6 +531,9 @@ function replay() {
     },
     text2b64: function(arg1, arg2) {
       return stub.text2b64(arg1, arg2);
+    },
+    b642text: function(arg1, arg2) {
+      return stub.b642text(arg1, arg2);
     },
     newModelMapperStub: function(type) {
       var mapper = stub.newModelMapperStub(type);

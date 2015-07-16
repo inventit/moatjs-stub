@@ -181,6 +181,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Change History
 
+1.2.3 : July 16, 2015
+
+* Adds new function `b642text` for converting a base64 encoded string to plain text.
+
 1.2.2 : July 15, 2015
 
 * Fixed issues
